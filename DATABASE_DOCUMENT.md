@@ -27,10 +27,7 @@
 | 14 | `notifications` | `NotificationDB` | In-app user notifications |
 | 15 | `audit_logs` | `AuditLogDB` | Action audit trail |
 | 16 | `assets` | `AssetDB` | Equipment and asset inventory |
-| 17 | `contractors` | `ContractorDB` | Contractor company records |
-| 18 | `investigations` | `InvestigationDB` | Incident investigations |
-| 19 | `headsup` | `HeadsUpDB` | Broadcast site announcements |
-| 20 | `credentials` | `CredentialDB` | Worker licenses and certifications |
+
 
 > **Note:** The database uses no explicit foreign key constraints. Related records are linked by string ID fields (e.g. `user_id`, `issue_id`). There are no SQLAlchemy `relationship()` declarations — joins are done in router/service code.
 
@@ -465,91 +462,7 @@ Physical equipment and asset inventory.
 
 ---
 
-### 17. `contractors`
 
-Contractor company records.
-
-| Column | Type | Constraints | Default | Description |
-|---|---|---|---|---|
-| `id` | VARCHAR(64) | PRIMARY KEY | — | Contractor ID |
-| `company_name` | VARCHAR(255) | NOT NULL | — | Company name |
-| `contact_name` | VARCHAR(255) | NOT NULL | `''` | Primary contact person |
-| `contact_email` | VARCHAR(255) | NOT NULL | `''` | Contact email address |
-| `contact_phone` | VARCHAR(50) | NOT NULL | `''` | Contact phone number |
-| `abn` | VARCHAR(50) | NOT NULL | `''` | Australian Business Number |
-| `status` | VARCHAR(50) | NOT NULL | `active` | One of: `active` · `inactive` |
-| `trade_type` | VARCHAR(100) | NOT NULL | `''` | Type of trade/service |
-| `site` | VARCHAR(255) | NOT NULL | `''` | Primary site |
-| `documents` | JSON | NOT NULL | `[]` | List of linked document objects |
-| `notes` | TEXT | NOT NULL | `''` | General notes |
-| `created_at` | DATETIME(tz) | NOT NULL | `now()` | Creation timestamp |
-
----
-
-### 18. `investigations`
-
-Incident investigation records.
-
-| Column | Type | Constraints | Default | Description |
-|---|---|---|---|---|
-| `id` | VARCHAR(64) | PRIMARY KEY | — | Investigation ID |
-| `title` | VARCHAR(255) | NOT NULL | — | Investigation title |
-| `incident_date` | DATE | NOT NULL | — | Date the incident occurred |
-| `incident_type` | VARCHAR(100) | NOT NULL | `near_miss` | One of: `near_miss` · `injury` · `property_damage` |
-| `severity` | VARCHAR(50) | NOT NULL | `medium` | One of: `low` · `medium` · `high` · `critical` |
-| `site` | VARCHAR(255) | NOT NULL | `''` | Incident site |
-| `description` | TEXT | NOT NULL | `''` | Incident description |
-| `involved_parties` | JSON | NOT NULL | `[]` | List of person name/role objects |
-| `immediate_actions` | TEXT | NOT NULL | `''` | Immediate response actions taken |
-| `root_causes` | JSON | NOT NULL | `[]` | List of identified root cause strings |
-| `corrective_actions` | JSON | NOT NULL | `[]` | List of corrective action description strings |
-| `media_urls` | JSON | NOT NULL | `[]` | List of evidence file URLs |
-| `linked_issue_id` | VARCHAR(64) | NULLABLE | — | References `issues.id` (optional) |
-| `linked_inspection_id` | VARCHAR(64) | NULLABLE | — | References `inspection_records.id` (optional) |
-| `status` | VARCHAR(50) | NOT NULL | `open` | One of: `open` · `in_progress` · `closed` |
-| `created_by` | VARCHAR(64) | NOT NULL | `u-admin` | Creator user ID |
-| `created_at` | DATETIME(tz) | NOT NULL | `now()` | Creation timestamp |
-
----
-
-### 19. `headsup`
-
-Broadcast announcements sent to sites.
-
-| Column | Type | Constraints | Default | Description |
-|---|---|---|---|---|
-| `id` | VARCHAR(64) | PRIMARY KEY | — | Announcement ID |
-| `title` | VARCHAR(255) | NOT NULL | — | Announcement title |
-| `body` | TEXT | NOT NULL | `''` | Full message body |
-| `author_id` | VARCHAR(64) | NOT NULL | `u-admin` | User ID of author |
-| `author_name` | VARCHAR(255) | NOT NULL | `''` | Denormalised author name |
-| `sites` | JSON | NOT NULL | `[]` | List of target site name strings |
-| `attachments` | JSON | NOT NULL | `[]` | List of attachment file URL strings |
-| `acknowledgments` | JSON | NOT NULL | `[]` | List of user IDs who have acknowledged |
-| `is_active` | BOOLEAN | NOT NULL | `true` | Soft-delete flag |
-| `created_at` | DATETIME(tz) | NOT NULL | `now()` | Creation timestamp |
-
----
-
-### 20. `credentials`
-
-Worker licenses, certifications, and training records.
-
-| Column | Type | Constraints | Default | Description |
-|---|---|---|---|---|
-| `id` | VARCHAR(64) | PRIMARY KEY | — | Credential ID |
-| `user_id` | VARCHAR(64) | NOT NULL | — | References `users.id` |
-| `user_name` | VARCHAR(255) | NOT NULL | `''` | Denormalised user display name |
-| `credential_type` | VARCHAR(100) | NOT NULL | — | One of: `License` · `Certification` · `Training` |
-| `credential_number` | VARCHAR(100) | NOT NULL | `''` | License/cert reference number |
-| `issuing_authority` | VARCHAR(255) | NOT NULL | `''` | Issuing body name |
-| `issued_date` | DATE | NULLABLE | — | Issue date |
-| `expiry_date` | DATE | NULLABLE | — | Expiry date (used to sort credentials; expiring soonest first) |
-| `file_url` | TEXT | NULLABLE | — | Path to scanned credential file |
-| `notes` | TEXT | NOT NULL | `''` | Additional notes |
-| `created_at` | DATETIME(tz) | NOT NULL | `now()` | Creation timestamp |
-
----
 
 ## Entity Relationship Diagram (logical)
 
